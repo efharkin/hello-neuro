@@ -1,0 +1,7 @@
+# System files.
+.DS_Store
+
+# Non-source program files.
+*.o
+*.so
+*.out
