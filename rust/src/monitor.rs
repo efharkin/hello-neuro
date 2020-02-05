@@ -1,10 +1,10 @@
-struct Monitor {
+pub struct Monitor {
     name: String,
     value: f32
 }
 
 impl Monitor {
-    fn to_string(&self) -> String {
+    pub fn to_string(&self) -> String {
         let mut monitor_string = String::from(self.name);
         monitor_string.push_str(": ");
         monitor_string.push_str(String::from(self.value));
@@ -12,13 +12,13 @@ impl Monitor {
     }
 }
 
-struct MonitorArrayWriter{
+pub struct MonitorArrayWriter{
     monitors: Vec<&Monitor>,
     file: ??? //TODO: figure out how to attach file.
 }
 
 impl MonitorArrayWriter{
-    fn new(monitors: Vec<&Monitor>, file: ???) -> MonitorArrayWriter {
+    pub fn new(monitors: Vec<&Monitor>, file: ???) -> MonitorArrayWriter {
         // Init file connection
         MonitorArrayWriter {
             monitors: monitors,
@@ -26,7 +26,7 @@ impl MonitorArrayWriter{
         }
     }
 
-    fn write(&self) {
+    pub fn write(&self) {
         let mut line = String::from("{");
         for mon in self.monitors {
             line.push_str(mon.to_string);
@@ -36,7 +36,7 @@ impl MonitorArrayWriter{
         line.push_str("},\n");
     }
 
-    fn close(&self) {
+    pub fn close(&self) {
         //Write }
     }
 }
