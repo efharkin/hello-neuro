@@ -10,31 +10,31 @@ impl Monitor<'_> {
     pub fn to_string(&self) -> String {
         let mut monitor_string = String::from(self.name);
         monitor_string.push_str(": ");
-        monitor_string.push_str(String::from(self.value));
+        monitor_string.push_str(&self.value.to_string());
         return monitor_string;
     }
 }
 
-pub struct MonitorArrayWriter {
-    monitors: Vec<Monitor> where 'a Monitor,
-    path: Path,
+pub struct MonitorArrayWriter<'a> {
+    monitors: Vec<Monitor<'a>>,
+    path: &'a Path,
     file: File
 }
 
-impl MonitorArrayWriter<'_> {
-    pub fn new(monitors: Vec<Monitor>, path: Path) -> MonitorArrayWriter {
+impl<'a> MonitorArrayWriter<'_> {
+    pub fn new(monitors: Vec<Monitor<'a>>, path: &'a Path) -> MonitorArrayWriter<'a> {
         // Init file connection
-        let mut file = MonitorArrayWriter::get_file_connection(path);
+        let file = MonitorArrayWriter::get_file_connection(path);
         MonitorArrayWriter {
             monitors: monitors,
-            path: path,
+            path: &path,
             file: file
         }
     }
 
-    fn get_file_connection(path: Path) -> File {
-        let mut file = match File::create(&path) {
-            Err(why) => panic!("Couldn't create file {}: {}", path.display(), why.description()),
+    fn get_file_connection(path: &'a Path) -> File {
+        let file = match File::create(path) {
+            Err(why) => panic!("Couldn't create file {}: {}", path.display(), why),
             Ok(file) => file
         };
         return file;
@@ -42,8 +42,8 @@ impl MonitorArrayWriter<'_> {
 
     pub fn write(&self) {
         let mut line = String::from("{");
-        for mon in self.monitors {
-            line.push_str(mon.to_string);
+        for mon in &self.monitors {
+            line.push_str(&mon.to_string());
             line.push_str(", ");
         }
         line.truncate(line.len() - 2); // Strip trailing comma.
@@ -63,10 +63,10 @@ mod tests {
     fn test_monitor_changing_variable() {
         let mut changing_variable : f32 = 10.0;
         let monitor = Monitor {
-            name: "testvar",
-            value: &changing_variable
+            name: String::from("testvar"),
+            value: &mut changing_variable
         };
         changing_variable = 20.0;
-        assert_eq!(monitor.value, 20, "Monitor value does not change with target variable.")
+        assert_eq!(*monitor.value, 20.0, "Monitor value does not change with target variable.")
     }
 }
