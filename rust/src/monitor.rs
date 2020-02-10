@@ -1,12 +1,19 @@
 use std::fs::File;
 use std::path::Path;
 
-pub struct Monitor<'a> {
+pub struct Monitor<T> {
     name: String,
-    value: &'a mut f32
+    value: *const T
 }
 
-impl Monitor<'_> {
+impl<T> Monitor<T> {
+    pub fn new(name: String, value: &T) -> Monitor<T> {
+        Monitor{
+            name: name,
+            value: value as *const T
+        }
+    }
+
     pub fn to_string(&self) -> String {
         let mut monitor_string = String::from(self.name);
         monitor_string.push_str(": ");
@@ -15,14 +22,14 @@ impl Monitor<'_> {
     }
 }
 
-pub struct MonitorArrayWriter<'a> {
-    monitors: Vec<Monitor<'a>>,
+pub struct MonitorArrayWriter<'a, T> {
+    monitors: Vec<Monitor<T>>,
     path: &'a Path,
     file: File
 }
 
-impl<'a> MonitorArrayWriter<'_> {
-    pub fn new(monitors: Vec<Monitor<'a>>, path: &'a Path) -> MonitorArrayWriter<'a> {
+impl<'a, T> MonitorArrayWriter<'a, T> {
+    pub fn new(monitors: Vec<Monitor<T>>, path: &'a Path) -> MonitorArrayWriter<'a, T> {
         // Init file connection
         let file = MonitorArrayWriter::get_file_connection(path);
         MonitorArrayWriter {
@@ -32,7 +39,7 @@ impl<'a> MonitorArrayWriter<'_> {
         }
     }
 
-    fn get_file_connection(path: &'a Path) -> File {
+    fn get_file_connection(path: &Path) -> File {
         let file = match File::create(path) {
             Err(why) => panic!("Couldn't create file {}: {}", path.display(), why),
             Ok(file) => file
