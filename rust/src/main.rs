@@ -1,4 +1,4 @@
-mod models;
+mod simulation;
 
 fn main() {
     println!("Hello, world!");
