@@ -28,7 +28,7 @@ impl StaticConductance {
     }
 
     pub fn get_current(&self, voltage: Voltage, current_time: TimeStep) -> NeuroFloat{
-        let driving_force = voltage.0.get(current_time) - self.reversal_voltage;
+        let driving_force = voltage.0.dynamical_get(current_time) - self.reversal_voltage;
         let current = self.conductance * driving_force;
         return current;
     }
