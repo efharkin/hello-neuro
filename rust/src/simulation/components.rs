@@ -1,7 +1,7 @@
 use specs::prelude::*;
 use crate::simulation::dynamical_variable::*;
 
-struct Voltage(DynamicalScalar<NeuroFloat>);
+pub struct Voltage(DynamicalScalar<NeuroFloat>);
 
 impl Component for Voltage {
     type Storage = VecStorage<Self>;
