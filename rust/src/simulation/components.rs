@@ -1,13 +1,13 @@
 use specs::prelude::*;
 use crate::simulation::dynamical_variable::*;
 
-pub struct Voltage(DynamicalScalar<NeuroFloat>);
+pub struct Voltage(pub DynamicalScalar<NeuroFloat>);
 
 impl Component for Voltage {
     type Storage = VecStorage<Self>;
 }
 
-pub struct Capacitance(NeuroFloat);
+pub struct Capacitance(pub NeuroFloat);
 
 impl Component for Capacitance {
     type Storage = VecStorage<Self>;
@@ -27,7 +27,7 @@ impl StaticConductance {
         }
     }
 
-    pub fn get_current(&self, voltage: Voltage, current_time: TimeStep) -> NeuroFloat{
+    pub fn get_current(&self, voltage: &Voltage, current_time: TimeStep) -> NeuroFloat {
         let driving_force = voltage.0.dynamical_get(current_time) - self.reversal_voltage;
         let current = self.conductance * driving_force;
         return current;
