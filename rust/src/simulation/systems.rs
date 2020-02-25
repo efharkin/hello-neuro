@@ -26,3 +26,29 @@ impl<'a> System<'a> for StaticConductanceHandler {
     }
 }
 
+struct HardThresholdHandler;
+
+impl<'a> System<'a> for HardThresholdHandler {
+    type SystemData = (
+        Read<'a, resources::TimeStep>,
+        WriteStorage<'a, Voltage>,
+        ReadStorage<'a, HardThreshold>,
+        ReadStorage<'a, VoltageReset>
+    );
+
+    /// Handle hard reset for components with a hard threshold.
+    ///
+    /// If current voltage is >= threshold, decrement towards hard reset by
+    /// (reset_potential - current_voltage) mV.
+    fn run(&mut self, (timestep, mut voltage, threshold, reset): Self::SystemData) {
+        let current_time = timestep.0;
+        for (voltage, threshold, reset)
+            in (&mut voltage, &threshold, &reset).join()
+        {
+            if voltage.0.dynamical_get(current_time) >= threshold.0 {
+                let distance_to_reset = reset.0 - voltage.0.dynamical_get(current_time);
+                voltage.0.dynamical_increment(distance_to_reset, current_time);
+            }
+        }
+    }
+}

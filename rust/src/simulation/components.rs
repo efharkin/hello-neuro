@@ -38,13 +38,13 @@ impl Component for StaticConductance {
     type Storage = VecStorage<Self>;
 }
 
-pub struct HardThreshold(NeuroFloat);
+pub struct HardThreshold(pub NeuroFloat);
 
 impl Component for HardThreshold {
     type Storage = VecStorage<Self>;
 }
 
-pub struct VoltageReset(NeuroFloat);
+pub struct VoltageReset(pub NeuroFloat);
 
 impl Component for VoltageReset {
     type Storage = VecStorage<Self>;
