@@ -7,6 +7,6 @@ pub struct TimeStep(pub usize);
 pub struct DeltaTime(pub f32);
 
 pub fn add_time_resources(world: &mut World, time_step_length: DeltaTime) {
-    world.insert(TimeStep(0));
+    world.insert(TimeStep(1));
     world.insert(time_step_length);
 }
