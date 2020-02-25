@@ -3,6 +3,12 @@ use crate::simulation::dynamical_variable::*;
 
 pub struct Voltage(pub DynamicalScalar<NeuroFloat>);
 
+impl Voltage {
+    pub fn new(initial_voltage: NeuroFloat) -> Voltage {
+        Voltage(DynamicalScalar::new(initial_voltage))
+    }
+}
+
 impl Component for Voltage {
     type Storage = VecStorage<Self>;
 }

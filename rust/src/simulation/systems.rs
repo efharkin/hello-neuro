@@ -3,7 +3,7 @@ use crate::simulation::components::*;
 use crate::simulation::resources;
 use crate::simulation::dynamical_variable::DynamicalVariable;
 
-struct StaticConductanceHandler;
+pub struct StaticConductanceHandler;
 
 impl<'a> System<'a> for StaticConductanceHandler {
     type SystemData = (
@@ -26,7 +26,7 @@ impl<'a> System<'a> for StaticConductanceHandler {
     }
 }
 
-struct HardThresholdHandler;
+pub struct HardThresholdHandler;
 
 impl<'a> System<'a> for HardThresholdHandler {
     type SystemData = (
