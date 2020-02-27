@@ -32,6 +32,7 @@ impl<'a> System<'a> for HardThresholdHandler {
     type SystemData = (
         Read<'a, resources::TimeStep>,
         WriteStorage<'a, Voltage>,
+        WriteStorage<'a, Spike>,
         ReadStorage<'a, HardThreshold>,
         ReadStorage<'a, VoltageReset>
     );
@@ -40,15 +41,36 @@ impl<'a> System<'a> for HardThresholdHandler {
     ///
     /// If current voltage is >= threshold, decrement towards hard reset by
     /// (reset_potential - current_voltage) mV.
-    fn run(&mut self, (timestep, mut voltage, threshold, reset): Self::SystemData) {
+    fn run(&mut self, (timestep, mut voltage, mut spike, threshold, reset): Self::SystemData) {
         let current_time = timestep.0;
-        for (voltage, threshold, reset)
-            in (&mut voltage, &threshold, &reset).join()
+        for (voltage, spike, threshold, reset)
+            in (&mut voltage, &mut spike, &threshold, &reset).join()
         {
             if voltage.0.dynamical_get(current_time) >= threshold.0 {
                 let distance_to_reset = reset.0 - voltage.0.dynamical_get(current_time);
                 voltage.0.dynamical_increment(distance_to_reset, current_time);
+
+                spike.0.dynamical_set(1, current_time);
+            } else {
+                spike.0.dynamical_set(0, current_time);
             }
+        }
+    }
+}
+
+pub struct SpikeMonitorHandler;
+
+impl<'a> System<'a> for SpikeMonitorHandler {
+    type SystemData = (
+        Read<'a, resources::TimeStep>,
+        ReadStorage<'a, Spike>,
+        WriteStorage<'a, SpikeMonitor>
+    );
+
+    fn run(&mut self, (timestep, spike, mut monitor): Self::SystemData) {
+        let current_time = timestep.0;
+        for (spike, monitor) in (&spike, &mut monitor).join() {
+            monitor.write(*spike, current_time);
         }
     }
 }

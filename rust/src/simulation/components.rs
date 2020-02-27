@@ -1,6 +1,7 @@
 use specs::prelude::*;
 use crate::simulation::dynamical_variable::*;
 
+#[derive(Copy, Clone)]
 pub struct Voltage(pub DynamicalScalar<NeuroFloat>);
 
 impl Voltage {
@@ -13,6 +14,7 @@ impl Component for Voltage {
     type Storage = VecStorage<Self>;
 }
 
+#[derive(Copy, Clone)]
 pub struct Capacitance(pub NeuroFloat);
 
 impl Component for Capacitance {
@@ -20,6 +22,7 @@ impl Component for Capacitance {
 }
 
 /// Voltage-independent conductance.
+#[derive(Copy, Clone)]
 pub struct StaticConductance {
     conductance: NeuroFloat,
     reversal_voltage: NeuroFloat
@@ -44,18 +47,21 @@ impl Component for StaticConductance {
     type Storage = VecStorage<Self>;
 }
 
+#[derive(Copy, Clone)]
 pub struct HardThreshold(pub NeuroFloat);
 
 impl Component for HardThreshold {
     type Storage = VecStorage<Self>;
 }
 
+#[derive(Copy, Clone)]
 pub struct VoltageReset(pub NeuroFloat);
 
 impl Component for VoltageReset {
     type Storage = VecStorage<Self>;
 }
 
+#[derive(Copy, Clone)]
 pub struct Spike(pub DynamicalScalar<usize>);
 
 impl Spike {
@@ -71,7 +77,7 @@ impl Component for Spike {
 
 // MONITORS
 pub trait Monitor<T> {
-   fn write(&self, monitored_variable: T, current_time: TimeStep);
+   fn write(&mut self, monitored_variable: T, current_time: TimeStep);
 }
 
 pub struct SpikeMonitor {
@@ -87,10 +93,10 @@ impl SpikeMonitor {
 }
 
 impl Monitor<Spike> for SpikeMonitor {
-    fn write(&self, monitored_variable: Spike, current_time: TimeStep) {
+    fn write(&mut self, monitored_variable: Spike, current_time: TimeStep) {
         use std::io::Write;
         if monitored_variable.0.dynamical_get(current_time) > 0 {
-            writeln!(self.bufwriter, "{}", current_time);
+            writeln!(self.bufwriter, "{}", current_time).expect("Failed to write spike to file.");
         }
     }
 }
@@ -112,9 +118,9 @@ impl VoltageMonitor {
 }
 
 impl Monitor<Voltage> for VoltageMonitor {
-    fn write(&self, monitored_variable: Voltage, current_time: TimeStep) {
+    fn write(&mut self, monitored_variable: Voltage, current_time: TimeStep) {
         use std::io::Write;
-        writeln!(self.bufwriter, "{}", monitored_variable.0.dynamical_get(current_time));
+        writeln!(self.bufwriter, "{}", monitored_variable.0.dynamical_get(current_time)).expect("Failed to write voltage to file.");
     }
 }
 

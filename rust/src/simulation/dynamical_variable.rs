@@ -9,6 +9,7 @@ pub trait DynamicalVariable<T>
     fn dynamical_increment(&mut self, amount: T, current_time: TimeStep);
 }
 
+#[derive(Copy, Clone)]
 pub struct DynamicalScalar<T>
     where T: std::ops::AddAssign + std::marker::Copy
 {
