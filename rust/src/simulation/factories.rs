@@ -63,6 +63,7 @@ pub fn create_lif_ensemble(simulation: &mut NeuroSimulation, ensemble_name: &str
     simulation.world.register::<HardThreshold>();
     simulation.world.register::<VoltageReset>();
     simulation.world.register::<Voltage>();
+    simulation.world.register::<ConstantInput>();
     simulation.world.register::<Spike>();
     simulation.world.register::<VoltageMonitor>();
     simulation.world.register::<SpikeMonitor>();
@@ -87,6 +88,7 @@ pub fn create_lif_ensemble(simulation: &mut NeuroSimulation, ensemble_name: &str
             .with(
                 VoltageMonitor::new(voltage_dataset, neuron_num)
             )
+            .with(ConstantInput(0.15))
             .with(
                 SpikeMonitor::new(
                     std::fs::File::create(

@@ -76,6 +76,16 @@ impl Component for Spike {
 }
 
 
+// INPUT SOURCES
+
+#[derive(Copy, Clone)]
+pub struct ConstantInput(pub NeuroFloat);
+
+impl Component for ConstantInput {
+    type Storage = VecStorage<Self>;
+}
+
+
 // MONITORS
 pub trait Monitor<T> {
    fn write(&mut self, monitored_variable: T, current_time: TimeStep);

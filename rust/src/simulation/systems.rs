@@ -26,6 +26,27 @@ impl<'a> System<'a> for StaticConductanceHandler {
     }
 }
 
+pub struct ConstantInputHandler;
+
+impl<'a> System<'a> for ConstantInputHandler {
+    type SystemData = (
+        Read<'a, resources::TimeStep>,
+        WriteStorage<'a, Voltage>,
+        ReadStorage<'a, Capacitance>,
+        ReadStorage<'a, ConstantInput>
+    );
+
+    fn run(&mut self, (timestep, mut voltage, capacitance, constant_input): Self::SystemData) {
+        let current_time = timestep.0;
+        for (voltage, capacitance, constant_input)
+            in (&mut voltage, &capacitance, &constant_input).join()
+        {
+            let voltage_increment = constant_input.0 / capacitance.0;
+            voltage.0.dynamical_increment(voltage_increment, current_time);
+        }
+    }
+}
+
 pub struct HardThresholdHandler;
 
 impl<'a> System<'a> for HardThresholdHandler {

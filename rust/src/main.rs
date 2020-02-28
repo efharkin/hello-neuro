@@ -20,6 +20,7 @@ fn main() {
         .with(HardThresholdHandler, "hard_threshold_handler", &[])
         .with(SpikeMonitorHandler, "spike_monitor_handler", &[])
         .with(VoltageMonitorHandler, "voltage_monitor_handler", &[])
+        .with(ConstantInputHandler, "constant_input_handler", &[])
         .build();
 
     sim.run(&mut dispatcher);
