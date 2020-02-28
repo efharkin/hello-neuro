@@ -1,5 +1,6 @@
 use specs::prelude::*;
 use crate::simulation::dynamical_variable::*;
+use ndarray;
 
 #[derive(Copy, Clone)]
 pub struct Voltage(pub DynamicalScalar<NeuroFloat>);
@@ -106,21 +107,29 @@ impl Component for SpikeMonitor {
 }
 
 pub struct VoltageMonitor {
-    bufwriter: std::io::BufWriter<std::fs::File>,
+    output_dataset: hdf5::Dataset,
+    neuron_number: usize
 }
 
 impl VoltageMonitor {
-    pub fn new(output_file: std::fs::File) -> VoltageMonitor {
+    pub fn new(output_dataset: hdf5::Dataset, neuron_number: usize) -> VoltageMonitor {
         VoltageMonitor {
-            bufwriter: std::io::BufWriter::new(output_file)
+            output_dataset: output_dataset,
+            neuron_number: neuron_number
         }
     }
 }
 
 impl Monitor<Voltage> for VoltageMonitor {
     fn write(&mut self, monitored_variable: Voltage, current_time: TimeStep) {
-        use std::io::Write;
-        writeln!(self.bufwriter, "{}", monitored_variable.0.dynamical_get(current_time)).expect("Failed to write voltage to file.");
+        use ndarray::s;
+        let current_value: NeuroFloat = monitored_variable.0.dynamical_get(current_time);
+        self.output_dataset
+            .write_slice(
+                &[current_value],
+                s![current_time..(current_time + 1)]
+            )
+            .expect("Could not write to VoltageMonitor output dataset.");
     }
 }
 

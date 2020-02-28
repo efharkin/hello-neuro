@@ -74,3 +74,20 @@ impl<'a> System<'a> for SpikeMonitorHandler {
         }
     }
 }
+
+pub struct VoltageMonitorHandler;
+
+impl<'a> System<'a> for VoltageMonitorHandler {
+    type SystemData = (
+        Read<'a, resources::TimeStep>,
+        ReadStorage<'a, Voltage>,
+        WriteStorage<'a, VoltageMonitor>
+    );
+
+    fn run(&mut self, (timestep, voltage, mut monitor): Self::SystemData) {
+        let current_time = timestep.0;
+        for (voltage, monitor) in (&voltage, &mut monitor).join() {
+            monitor.write(*voltage, current_time);
+        }
+    }
+}
